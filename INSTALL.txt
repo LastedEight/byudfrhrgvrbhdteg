@@ -1,0 +1,78 @@
+FPV Drone -- a VTOL VR mod
+==========================
+
+Carry a quadcopter in your aircraft, release it, and fly it yourself while
+watching through FPV goggles that flip down over your eyes.
+
+F8 deploys it. F9 drops the goggles. Your thumbsticks fly it.
+
+
+TO INSTALL
+----------
+
+1. Install the VTOL VR Mod Loader:  https://vtolvr-mods.com/
+2. Install the .NET SDK:            https://dotnet.microsoft.com/download
+3. Double-click build.cmd.
+
+That's it. The script finds your VTOL VR install and the mod loader, builds the
+mod against the game's own files, and copies it into the loader's mods folder.
+
+On Linux or macOS, run ./build.sh instead.
+
+If the script can't find the game, tell it where it is:
+
+    powershell -ExecutionPolicy Bypass -File build.ps1 -VtolVrDir "D:\SteamLibrary\steamapps\common\VTOL VR"
+
+Then launch VTOL VR through the mod loader and enable "FPV Drone".
+
+
+WHY YOU HAVE TO BUILD IT
+------------------------
+
+There is no prebuilt .dll in this package, and there cannot be one. The mod
+compiles against UnityEngine.dll from your VTOLVR_Data\Managed folder and
+ModLoader.dll from the mod loader. Neither is redistributable, and a binary
+built against different versions of them would refuse to load anyway.
+
+Building takes a few seconds once the SDK is installed.
+
+
+BEFORE YOU FLY
+--------------
+
+This mod has never been run inside VTOL VR -- it was written without the game
+available to test against. It is written defensively for exactly that reason:
+everything it needs from the game is looked up by name at runtime, with a
+fallback and a log warning for each, so a mismatch costs you one feature rather
+than the whole mod.
+
+docs\TESTING.md is a checklist ordered so that each step exercises one
+subsystem, tells you which log line to look for, and says what a failure at that
+step points at. Start there rather than with a full mission.
+
+Turn on "Verbose logging" on the mod's settings page first. Everything it prints
+is prefixed [FPVDrone], in:
+
+    %USERPROFILE%\AppData\LocalLow\Boundless Dynamics, LLC\VTOLVR\Player.log
+
+
+WHAT'S IN THE BOX
+-----------------
+
+  build.cmd / build.ps1   Build and install (Windows)
+  build.sh                Build and install (Linux, macOS)
+  Info.json               Mod metadata for the loader
+  src/DroneMod/           The mod itself, 26 source files
+  docs/CONTROLS.md        Every binding, and how the flight modes differ
+  docs/TESTING.md         First-run checklist
+  docs/COMPATIBILITY.md   What the mod assumes about the game, and what breaks
+                          if an assumption is wrong
+  docs/ARCHITECTURE.md    How it works and why it is built this way
+  docs/BUILDING.md        Building by hand, and using a different mod loader
+  tools/compile-check/    Type-checks the sources without Unity installed
+
+
+LICENCE
+-------
+
+MIT. See LICENSE.
