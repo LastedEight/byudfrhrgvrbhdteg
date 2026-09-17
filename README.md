@@ -30,11 +30,26 @@ cockpit disappears behind the video feed; flip them up and you are back in the j
 
 ## Install
 
-1. Install the [VTOL VR Mod Loader](https://vtolvr-mods.com/).
-2. Build the mod (see [docs/BUILDING.md](docs/BUILDING.md)) or drop a prebuilt
-   `FpvDroneMod.dll` and `Info.json` into a folder under the loader's `mods`
-   directory.
+1. Install the [VTOL VR Mod Loader](https://vtolvr-mods.com/) and the
+   [.NET SDK](https://dotnet.microsoft.com/download).
+2. Run `build.cmd` (double-click) or `./build.sh` on Linux/macOS.
 3. Launch through the mod loader and enable **FPV Drone**.
+
+The build script finds your VTOL VR install and the mod loader, compiles the DLL
+against the game's own assemblies, and copies it into the loader's `mods` folder.
+If it cannot find the game, pass it explicitly:
+
+```powershell
+.uild.ps1 -VtolVrDir "D:\SteamLibrary\steamapps\common\VTOL VR"
+```
+
+**There is no prebuilt DLL, and there cannot be one.** The mod compiles against
+`UnityEngine.dll` from `VTOLVR_Data\Managed` and `ModLoader.dll` from the mod
+loader. Neither is redistributable, and a binary built against different versions
+of them would not load. Building takes a few seconds once the SDK is installed.
+
+Then work through [docs/TESTING.md](docs/TESTING.md) — it is ordered so that each
+step isolates one subsystem, and says what a failure points at.
 
 ## Controls
 
@@ -63,7 +78,7 @@ written defensively and are the parts to check first:
   renamed costs you one feature, not the mod.
 
 See [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) for the specific assumptions and
-how to confirm each one.
+[docs/TESTING.md](docs/TESTING.md) for a checklist that confirms each one in order.
 
 ## Layout
 
@@ -76,7 +91,9 @@ src/DroneMod/
   Input/              Thumbstick and keyboard handling
   View/               Goggles and OSD
   Util/               Maths, PID, runtime asset generation, logging
-docs/                 Building, controls, architecture, compatibility
+build.ps1 / build.cmd Build and install on Windows
+build.sh              Build and install on Linux and macOS
+docs/                 Building, controls, testing, architecture, compatibility
 tools/compile-check/  Type-checks the sources without Unity installed
 ```
 

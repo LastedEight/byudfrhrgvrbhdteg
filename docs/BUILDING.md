@@ -14,6 +14,19 @@ the game's `Managed` folder.
 
 ## Build
 
+The quickest path is the script, which finds the game and the mod loader for you
+and installs the result:
+
+```powershell
+.\build.ps1                 # Windows; build.cmd is a double-clickable wrapper
+```
+
+```bash
+./build.sh                   # Linux / macOS
+```
+
+To drive MSBuild yourself:
+
 ```bash
 dotnet build -c Release -p:VtolVrDir="C:\Program Files (x86)\Steam\steamapps\common\VTOL VR"
 ```
