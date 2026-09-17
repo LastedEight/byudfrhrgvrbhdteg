@@ -1,0 +1,16 @@
+# Build output
+bin/
+obj/
+Builds/
+*.user
+*.suo
+*.userprefs
+.vs/
+.idea/
+
+# Compile-check scratch
+tools/compile-check/out/
+
+# OS noise
+.DS_Store
+Thumbs.db

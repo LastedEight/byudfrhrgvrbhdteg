@@ -1,0 +1,16 @@
+{
+  "Name": "FPV Drone",
+  "Description": "Deploy a quadcopter from your aircraft and fly it independently, watching through head-mounted FPV goggles that flip down over your eyes. Includes a full flight model, a two-axis camera gimbal, a range- and terrain-dependent video link, battery endurance, and return-to-home failsafes.",
+  "Version": "1.0.0",
+  "Tags": [
+    "Gameplay",
+    "Vehicles"
+  ],
+  "Dependencies": [],
+  "UnlistedDependencies": [],
+  "PublicID": "",
+  "WebsiteSource": "",
+  "IsPublic": false,
+  "ModVersions": [],
+  "LastUpdated": "2026-09-17T00:00:00Z"
+}

@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Builds FpvDroneMod.dll against the game's own Unity assemblies.
+
+    Point the build at your install, either by editing VtolVrDir below, setting a
+    VTOLVR_DIR environment variable, or passing it on the command line:
+
+        dotnet build -c Release -p:VtolVrDir="D:\Steam\steamapps\common\VTOL VR"
+
+    Note what is NOT referenced: Assembly-CSharp.dll. The mod reaches the game's
+    own types through reflection (see Core/GameBridge.cs), so it does not have to
+    be rebuilt every time VTOL VR reshapes its internals.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>FpvDroneMod</AssemblyName>
+    <RootNamespace>DroneMod</RootNamespace>
+    <LangVersion>7.3</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Deterministic>true</Deterministic>
+    <DebugType>portable</DebugType>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VtolVrDir Condition="'$(VtolVrDir)' == '' And '$(VTOLVR_DIR)' != ''">$(VTOLVR_DIR)</VtolVrDir>
+    <VtolVrDir Condition="'$(VtolVrDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\VTOL VR</VtolVrDir>
+    <VtolManagedDir>$(VtolVrDir)\VTOLVR_Data\Managed</VtolManagedDir>
+    <VtolModLoaderDir Condition="'$(VtolModLoaderDir)' == ''">$(VtolVrDir)\VTOLVR_ModLoader</VtolModLoaderDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference assemblies for net472, so this also builds on Linux and macOS. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Unity split UnityEngine.dll into modules in 2017. Both layouts are handled:
+      whichever files exist get referenced, the rest are skipped.
+    -->
+    <Reference Include="$(VtolManagedDir)\UnityEngine.dll" Private="false"
+               Condition="Exists('$(VtolManagedDir)\UnityEngine.dll')" />
+    <Reference Include="$(VtolManagedDir)\UnityEngine.CoreModule.dll" Private="false"
+               Condition="Exists('$(VtolManagedDir)\UnityEngine.CoreModule.dll')" />
+    <Reference Include="$(VtolManagedDir)\UnityEngine.PhysicsModule.dll" Private="false"
+               Condition="Exists('$(VtolManagedDir)\UnityEngine.PhysicsModule.dll')" />
+    <Reference Include="$(VtolManagedDir)\UnityEngine.AudioModule.dll" Private="false"
+               Condition="Exists('$(VtolManagedDir)\UnityEngine.AudioModule.dll')" />
+    <Reference Include="$(VtolManagedDir)\UnityEngine.TextRenderingModule.dll" Private="false"
+               Condition="Exists('$(VtolManagedDir)\UnityEngine.TextRenderingModule.dll')" />
+    <Reference Include="$(VtolManagedDir)\UnityEngine.InputLegacyModule.dll" Private="false"
+               Condition="Exists('$(VtolManagedDir)\UnityEngine.InputLegacyModule.dll')" />
+
+    <Reference Include="$(VtolModLoaderDir)\ModLoader.dll" Private="false"
+               Condition="Exists('$(VtolModLoaderDir)\ModLoader.dll')" />
+  </ItemGroup>
+
+  <Target Name="CheckGamePaths" BeforeTargets="BeforeBuild">
+    <Error Condition="!Exists('$(VtolManagedDir)')"
+           Text="VTOL VR managed assemblies not found at '$(VtolManagedDir)'. Set VtolVrDir to your install directory (see the comment at the top of this file)." />
+    <Warning Condition="!Exists('$(VtolModLoaderDir)\ModLoader.dll')"
+             Text="ModLoader.dll not found at '$(VtolModLoaderDir)'. Main.cs will not compile without it; install the VTOL VR Mod Loader or remove Main.cs and call DroneMod.Bootstrap.Initialise() from your own loader." />
+  </Target>
+
+  <!-- Drop the built DLL next to Info.json so the folder can be copied straight into the loader. -->
+  <Target Name="StageMod" AfterTargets="Build">
+    <MakeDir Directories="$(MSBuildProjectDirectory)\..\..\Builds\FpvDrone" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)\..\..\Builds\FpvDrone" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\..\..\Info.json" DestinationFolder="$(MSBuildProjectDirectory)\..\..\Builds\FpvDrone"
+          Condition="Exists('$(MSBuildProjectDirectory)\..\..\Info.json')" />
+    <Message Importance="high" Text="Staged mod at $(MSBuildProjectDirectory)\..\..\Builds\FpvDrone" />
+  </Target>
+
+</Project>
